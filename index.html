@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+
+        .sudoku-board {
+            display: grid;
+            grid-template-columns: repeat(9, 40px);
+            grid-template-rows: repeat(9, 40px);
+            gap: 1px;
+            background-color: #333;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            line-height: 40px;
+            border: 1px solid #ccc;
+            background-color: white;
+        }
+
+        .cell.fixed {
+            background-color: #f0f0f0;
+        }
+
+        .input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 18px;
+            background-color: transparent;
+        }
+
+        .input:focus {
+            outline: none;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sudoku-container">
+    <div id="board" class="sudoku-board"></div>
+    <button id="checkBtn" class="btn">Check Solution</button>
+</div>
+
+<script>
+// Simple 9x9 Sudoku puzzle example (0 means empty cell)
+const board = [
+    [5, 3, 0, 0, 7, 0, 0, 0, 0],
+    [6, 0, 0, 1, 9, 5, 0, 0, 0],
+    [0, 9, 8, 0, 0, 0, 0, 6, 0],
+    [8, 0, 0, 0, 6, 0, 0, 0, 3],
+    [4, 0, 0, 8, 0, 3, 0, 0, 1],
+    [7, 0, 0, 0, 2, 0, 0, 0, 6],
+    [0, 6, 0, 0, 0, 0, 2, 8, 0],
+    [0, 0, 0, 4, 1, 9, 0, 0, 5],
+    [0, 0, 0, 0, 8, 0, 0, 7, 9]
+];
+
+// Function to display the Sudoku board
+function displayBoard() {
+    const boardElement = document.getElementById('board');
+    boardElement.innerHTML = '';
+
+    for (let row = 0; row < 9; row++) {
+        for (let col = 0; col < 9; col++) {
+            const value = board[row][col];
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+
+            // Add input field for empty cells
+            if (value === 0) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.min = 1;
+                input.max = 9;
+                input.classList.add('input');
+                input.dataset.row = row;
+                input.dataset.col = col;
+                cell.appendChild(input);
+            } else {
+                cell.textContent = value;
+                cell.classList.add('fixed');
+            }
+
+            boardElement.appendChild(cell);
+        }
+    }
+}
+
+// Function to validate the solution
+function checkSolution() {
+    let isValid = true;
+    const inputs = document.querySelectorAll('.input');
+    inputs.forEach(input => {
+        const row = input.dataset.row;
+        const col = input.dataset.col;
+        const value = parseInt(input.value);
+
+        if (board[row][col] === 0 && !isValidValue(row, col, value)) {
+            isValid = false;
+        }
+    });
+
+    if (isValid) {
+        alert('Congratulations! You solved the puzzle.');
+    } else {
+        alert('Incorrect solution. Try again.');
+    }
+}
+
+// Function to check if the value is valid for the given row, column, and subgrid
+function isValidValue(row, col, value) {
+    if (value < 1 || value > 9) return false;
+
+    // Check row
+    for (let c = 0; c < 9; c++) {
+        if (board[row][c] === value) return false;
+    }
+
+    // Check column
+    for (let r = 0; r < 9; r++) {
+        if (board[r][col] === value) return false;
+    }
+
+    // Check 3x3 subgrid
+    const startRow = Math.floor(row / 3) * 3;
+    const startCol = Math.floor(col / 3) * 3;
+    for (let r = startRow; r < startRow + 3; r++) {
+        for (let c = startCol; c < startCol + 3; c++) {
+            if (board[r][c] === value) return false;
+        }
+    }
+
+    return true;
+}
+
+// Set up event listeners
+document.getElementById('checkBtn').addEventListener('click', checkSolution);
+
+// Initialize the game
+displayBoard();
+
+</script>
+
+</body>
+</html>
